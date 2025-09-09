@@ -24,7 +24,7 @@ input_data = pd.DataFrame({
     "customer_tier_cat": [customer_tier],
     "region_cat": [region],
     "product_area_cat": [product_area],
-    "customer_sentiment_cat": [customer_sentiment]
+   
 })
 
 if st.button("Predict"):
