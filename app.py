@@ -14,7 +14,7 @@ company_size = st.selectbox("Company Size", [1,2,3])
 customer_tier = st.selectbox("Customer Tier", [1,2,3])
 region = st.selectbox("Region", [1,2,3])
 product_area = st.selectbox("Product Area", [1,2,3,4,5,6])
-customer_sentiment = st.selectbox("Customer Sentiment", [1,2,3])
+
 
 input_data = pd.DataFrame({
     "customers_affected": [customers_affected],
