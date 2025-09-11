@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
 
 # Load model
 model = joblib.load("xgb_model.pkl")
@@ -22,7 +24,7 @@ Aplikasi ini memprediksi **prioritas tiket (Low, Medium, High)** berdasarkan inf
 Model yang digunakan adalah **XGBoost**, hasil dari final project Data Science.  
 """)
 
-# === Input User (hanya fitur penting) ===
+# === Input User ===
 st.subheader("Masukkan Data Ticket")
 
 customers_affected = st.number_input("Customers Affected", min_value=0)
@@ -35,6 +37,9 @@ customer_sentiment = st.selectbox("Customer Sentiment (1=Negatif, 2=Netral, 3=Po
 region = st.selectbox("Region (1=AMER, 2=EMEA, 3=APAC)", [1,2,3])
 product_area = st.selectbox("Product Area (1=Auth, 2=Billing, 3=Mobile, 4=Data Pipeline, 5=Analytic, 6=Notifications)", [1,2,3,4,5,6])
 
+reported_by_role = st.selectbox("Reported By Role (1=End User, 2=Admin, 3=Dev, 4=Other)", [1,2,3,4])
+payment_impact_flag = st.selectbox("Payment Impact Flag", [0,1])  # 0=No, 1=Yes
+
 # === Buat dataframe input dengan default values ===
 input_dict = {col: 0 for col in feature_names}
 input_dict.update({
@@ -45,7 +50,9 @@ input_dict.update({
     "customer_tier_cat": customer_tier,
     "customer_sentiment_cat": customer_sentiment,
     "region_cat": region,
-    "product_area_cat": product_area
+    "product_area_cat": product_area,
+    "reported_by_role_cat": reported_by_role,
+    "payment_impact_flag": payment_impact_flag
 })
 input_data = pd.DataFrame([input_dict])
 
@@ -67,7 +74,7 @@ if st.button("Predict"):
     else:
         st.error(f"Priority: **{result}** 🔴")
 
-    # Tampilkan probabilitas
+    # Probabilitas prediksi
     st.write("Probabilitas Prediksi:")
     st.bar_chart(pd.DataFrame({
         "Priority": ["Low", "Medium", "High"],
@@ -87,6 +94,13 @@ if st.button("Predict"):
     ax.invert_yaxis()
     ax.set_xlabel("Importance")
     st.pyplot(fig)
+
+# === Visualisasi tambahan (statis) ===
+st.subheader("📌 Distribusi Kelas Ticket (Dataset)")
+class_dist = pd.Series([0.50, 0.35, 0.15], index=["Low","Medium","High"])
+fig1, ax1 = plt.subplots()
+ax1.pie(class_dist, labels=class_dist.index, autopct="%.1f%%", startangle=90)
+st.pyplot(fig1)
 
 # === Footer ===
 st.markdown("---")
