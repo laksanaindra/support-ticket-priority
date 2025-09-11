@@ -30,10 +30,10 @@ downtime_min = st.number_input("Downtime (minutes)", min_value=0)
 error_rate_pct = st.number_input("Error Rate (%)", min_value=0.0, max_value=100.0)
 
 company_size = st.selectbox("Company Size (1=Small, 2=Medium, 3=Large)", [1,2,3])
-customer_tier = st.selectbox("Customer Tier (1=Bronze, 2=Silver, 3=Gold)", [1,2,3])
+customer_tier = st.selectbox("Customer Tier (1=Basic, 2=Plus, 3=Enterprise)", [1,2,3])
 customer_sentiment = st.selectbox("Customer Sentiment (1=Negatif, 2=Netral, 3=Positif)", [1,2,3])
-region = st.selectbox("Region", [1,2,3])
-product_area = st.selectbox("Product Area", [1,2,3,4,5,6])
+region = st.selectbox("Region (1=AMER, 2=EMEA, 3=APAC)", [1,2,3])
+product_area = st.selectbox("Product Area (1=Auth, 2=Billing, 3=Mobile, 4=Data Pipeline, 5=Analytic, 6=Notifications)", [1,2,3,4,5,6])
 
 # === Buat dataframe input dengan default values ===
 input_dict = {col: 0 for col in feature_names}
