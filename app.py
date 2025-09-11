@@ -38,7 +38,7 @@ region = st.selectbox("Region (1=AMER, 2=EMEA, 3=APAC)", [1,2,3])
 product_area = st.selectbox("Product Area (1=Auth, 2=Billing, 3=Mobile, 4=Data Pipeline, 5=Analytic, 6=Notifications)", [1,2,3,4,5,6])
 
 reported_by_role = st.selectbox("Reported By Role (1=Support, 2=Devops, 3=Product Manager, 4=Finance, 5=C Level)", [1,2,3,4,5])
-payment_impact_flag = st.selectbox("Payment Impact Flag (No=0, Yes=1)", [0,1])  # 0=No, 1=Yes
+payment_impact_flag = st.selectbox(" Payment Impact Problem?  (No=0, Yes=1)", [0,1])  # 0=No, 1=Yes
 
 # === Buat dataframe input dengan default values ===
 input_dict = {col: 0 for col in feature_names}
