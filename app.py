@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import matplotlib.pyplot as plt
 
 # Load model
 model = joblib.load("xgb_model.pkl")
@@ -14,24 +15,28 @@ feature_names = [
     'has_runbook', 'customer_sentiment_cat'
 ]
 
+# === Judul & Deskripsi ===
 st.title("🎫 Support Ticket Priority Prediction")
+st.markdown("""
+Aplikasi ini memprediksi **prioritas tiket (Low, Medium, High)** berdasarkan informasi awal tiket.  
+Model yang digunakan adalah **XGBoost**, hasil dari final project Data Science.  
+""")
 
 # === Input User (hanya fitur penting) ===
+st.subheader("Masukkan Data Ticket")
+
 customers_affected = st.number_input("Customers Affected", min_value=0)
 downtime_min = st.number_input("Downtime (minutes)", min_value=0)
 error_rate_pct = st.number_input("Error Rate (%)", min_value=0.0, max_value=100.0)
 
-company_size = st.selectbox("Company Size", [1,2,3])
-customer_tier = st.selectbox("Customer Tier", [1,2,3])
-customer_sentiment = st.selectbox("Customer Sentiment", [1,2,3])
+company_size = st.selectbox("Company Size (1=Small, 2=Medium, 3=Large)", [1,2,3])
+customer_tier = st.selectbox("Customer Tier (1=Bronze, 2=Silver, 3=Gold)", [1,2,3])
+customer_sentiment = st.selectbox("Customer Sentiment (1=Negatif, 2=Netral, 3=Positif)", [1,2,3])
 region = st.selectbox("Region", [1,2,3])
 product_area = st.selectbox("Product Area", [1,2,3,4,5,6])
 
 # === Buat dataframe input dengan default values ===
-# Default semua kolom = 0
 input_dict = {col: 0 for col in feature_names}
-
-# Isi kolom yang user input
 input_dict.update({
     "customers_affected": customers_affected,
     "downtime_min": downtime_min,
@@ -42,12 +47,47 @@ input_dict.update({
     "region_cat": region,
     "product_area_cat": product_area
 })
-
-# Buat dataframe 1 baris
 input_data = pd.DataFrame([input_dict])
 
 # === Prediksi ===
 if st.button("Predict"):
     pred = model.predict(input_data)[0]
+    probs = model.predict_proba(input_data)[0]  # probabilitas prediksi
+    
     mapping = {0:"Low", 1:"Medium", 2:"High"}
-    st.success(f"Predicted Priority: **{mapping[pred]}**")
+    result = mapping[pred]
+
+    st.subheader("Hasil Prediksi")
+
+    # Tampilkan hasil dengan warna
+    if result == "Low":
+        st.success(f"Priority: **{result}** ⚪")
+    elif result == "Medium":
+        st.warning(f"Priority: **{result}** 🟡")
+    else:
+        st.error(f"Priority: **{result}** 🔴")
+
+    # Tampilkan probabilitas
+    st.write("Probabilitas Prediksi:")
+    st.bar_chart(pd.DataFrame({
+        "Priority": ["Low", "Medium", "High"],
+        "Probability": probs
+    }).set_index("Priority"))
+
+    # === Feature Importance (Top 10) ===
+    st.subheader("📊 Feature Importance (Top 10)")
+    importances = model.feature_importances_
+    feat_imp = pd.DataFrame({
+        "Feature": feature_names,
+        "Importance": importances
+    }).sort_values("Importance", ascending=False).head(10)
+
+    fig, ax = plt.subplots()
+    ax.barh(feat_imp["Feature"], feat_imp["Importance"])
+    ax.invert_yaxis()
+    ax.set_xlabel("Importance")
+    st.pyplot(fig)
+
+# === Footer ===
+st.markdown("---")
+st.caption("Created by Indra Laksana | Final Project Data Science")
