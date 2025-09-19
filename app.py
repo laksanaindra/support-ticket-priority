@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 # Load model
 model = joblib.load("xgb_model.pkl")
 
-# List kolom sesuai training
+# List kolom 
 feature_names = [
     'company_size_cat', 'industry_cat', 'customer_tier_cat', 'org_users', 'region_cat',
     'past_30d_tickets', 'past_90d_incidents', 'product_area_cat', 'booking_channel_cat',
@@ -17,14 +17,14 @@ feature_names = [
     'has_runbook', 'customer_sentiment_cat'
 ]
 
-# === Judul & Deskripsi ===
+# Title
 st.title("🎫 Support Ticket Priority Prediction")
 st.markdown("""
 Aplikasi ini memprediksi **prioritas tiket (Low, Medium, High)** berdasarkan informasi awal tiket.  
 Model yang digunakan adalah **XGBoost**, hasil dari final project Data Science.  
 """)
 
-# === Input User ===
+# Input Data
 st.subheader("Masukkan Data Ticket")
 
 customers_affected = st.number_input("Customers Affected", min_value=0)
@@ -40,7 +40,7 @@ product_area = st.selectbox("Product Area (1=Auth, 2=Billing, 3=Mobile, 4=Data P
 reported_by_role = st.selectbox("Reported By Role (1=Support, 2=Devops, 3=Product Manager, 4=Finance, 5=C Level)", [1,2,3,4,5])
 payment_impact_flag = st.selectbox(" Payment Impact Problem?  (No=0, Yes=1)", [0,1])  # 0=No, 1=Yes
 
-# === Buat dataframe input dengan default values ===
+# Buat dataframe input dengan default values
 input_dict = {col: 0 for col in feature_names}
 input_dict.update({
     "customers_affected": customers_affected,
@@ -56,7 +56,7 @@ input_dict.update({
 })
 input_data = pd.DataFrame([input_dict])
 
-# === Prediksi ===
+# Prediksi
 if st.button("Predict"):
     pred = model.predict(input_data)[0]
     probs = model.predict_proba(input_data)[0]  # probabilitas prediksi
@@ -66,7 +66,7 @@ if st.button("Predict"):
 
     st.subheader("Hasil Prediksi")
 
-    # Tampilkan hasil dengan warna
+    # Tampilkan hasil
     if result == "Low":
         st.success(f"Priority: **{result}** ⚪👌")
     elif result == "Medium":
@@ -81,7 +81,7 @@ if st.button("Predict"):
         "Probability": probs
     }).set_index("Priority"))
 
-    # === Feature Importance (Top 10) ===
+    # Feature Importance
     st.subheader("Top 10 Feature Importance")
     importances = model.feature_importances_
     feat_imp = pd.DataFrame({
@@ -95,13 +95,13 @@ if st.button("Predict"):
     ax.set_xlabel("Importance")
     st.pyplot(fig)
 
-# === Visualisasi tambahan (statis) ===
+# Visualisasi tambahan (statis)
 st.subheader("Distribusi Kelas Ticket (Dataset)")
 class_dist = pd.Series([0.50, 0.35, 0.15], index=["Low","Medium","High"])
 fig1, ax1 = plt.subplots()
 ax1.pie(class_dist, labels=class_dist.index, autopct="%.1f%%", startangle=90)
 st.pyplot(fig1)
 
-# === Footer ===
+# Footer
 st.markdown("---")
 st.caption("Created by Indra Laksana | Final Project Data Science")
